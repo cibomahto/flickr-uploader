@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <string name="app_name">FUploadr</string>
+<string name="upload_title">Title</string>
+<string name="upload_description">Description</string>
+<string name="upload_tags">Tags (comma separated)</string>
+<string name="upload_upload">Upload Photo</string>
+<string name="authenticate_done">Finished Authenticating</string>
+<string name="settings_defaults">Modify Default Settings</string>
+<string name="settings_account_authorize">Authorize Account</string>
+<string name="settings_account_new">Change Account</string>
+</resources>

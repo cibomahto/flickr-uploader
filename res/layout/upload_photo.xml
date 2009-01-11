@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/ScrollView01" android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+	<LinearLayout android:orientation="vertical"
+		android:layout_width="fill_parent" android:layout_height="fill_parent">
+		<TextView android:id="@+id/TextView01" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:text="@string/upload_title"></TextView>
+		<EditText android:layout_height="wrap_content"
+			android:layout_width="fill_parent" android:id="@+id/TitleText"></EditText>
+		<TextView android:id="@+id/TextView02" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:text="@string/upload_description"></TextView>
+		<EditText android:layout_height="wrap_content"
+			android:layout_width="fill_parent" android:minLines="2"
+			android:gravity="top" android:id="@+id/DescriptionText"></EditText>
+		<TextView android:id="@+id/TextView03" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:text="@string/upload_tags"></TextView>
+		<EditText android:layout_height="wrap_content"
+			android:layout_width="fill_parent" android:minLines="1" android:id="@+id/TagsText"></EditText>
+		<Button android:id="@+id/Button01" android:layout_height="wrap_content"
+			android:layout_width="fill_parent" android:text="@string/upload_upload"></Button>
+	</LinearLayout>
+</ScrollView>
