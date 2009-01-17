@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     
-    <string name="app_name">FUploadr</string>
+<string name="app_name">FlickrBot</string>
 <string name="upload_title">Title</string>
 <string name="upload_description">Description</string>
 <string name="upload_tags">Tags (comma separated)</string>
@@ -10,4 +10,8 @@
 <string name="settings_defaults">Modify Default Settings</string>
 <string name="settings_account_authorize">Authorize Account</string>
 <string name="settings_account_new">Change Account</string>
+<string name="authorize_authorized">Welcome %1$s, you are connected to Flickr.  You can now send photos from any photo application by selecting %2$s in the SENDTO dialog</string>
+<string name="authorize_not_valid">Oops!  Your authentication has expired.  Please register again by clicking the \'Authorize Account\' button below.</string>
+<string name="authorize_waiting_for_authorization">Sorry, the request did not go through.  Please try registering again by clicking the \'Authorize Account\' button below.</string>
+<string name="authorize_not_started">Welcome!  Click the \'Authorize Account\' button to begin.  In the browser window that opens, log into your account and authorize this app.  Then return here to finish the process!  Whew!</string>
 </resources>

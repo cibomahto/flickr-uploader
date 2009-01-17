@@ -5,7 +5,7 @@
  * should not be modified by hand.
  */
 
-package com.android.fuploadr;
+package com.android.flickrbot;
 
 public final class R {
     public static final class attr {
@@ -34,6 +34,10 @@ public final class R {
     public static final class string {
         public static final int app_name=0x7f040000;
         public static final int authenticate_done=0x7f040005;
+        public static final int authorize_authorized=0x7f040009;
+        public static final int authorize_not_started=0x7f04000c;
+        public static final int authorize_not_valid=0x7f04000a;
+        public static final int authorize_waiting_for_authorization=0x7f04000b;
         public static final int settings_account_authorize=0x7f040007;
         public static final int settings_account_new=0x7f040008;
         public static final int settings_defaults=0x7f040006;

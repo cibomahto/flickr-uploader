@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="com.android.fuploadr"
       android:versionCode="1"
-      android:versionName="1.0.0">
+      android:versionName="1.0.0" package="com.android.flickrbot">
     
 
 <uses-permission android:name="android.permission.INTERNET"></uses-permission>
-<application android:label="@string/app_name" android:icon="@drawable/icon"><activity android:name="FUploadr"><intent-filter android:label="FUploader Configuration"><action android:name="android.intent.action.MAIN"></action>
+<application android:label="@string/app_name" android:icon="@drawable/icon"><activity android:name="com.android.flickrbot.FlickrBot"><intent-filter android:label="Configure FlickrBot" android:icon="@drawable/icon"><action android:name="android.intent.action.MAIN"></action>
 <category android:name="android.intent.category.LAUNCHER"></category>
 </intent-filter>
-<intent-filter android:label="Flickr using FUploader"><action android:name="android.intent.action.SEND"></action>
+<intent-filter android:label="FlickrBot" android:icon="@drawable/icon"><action android:name="android.intent.action.SEND"></action>
 
 <data android:mimeType="image/*"></data>
 <category android:name="android.intent.category.DEFAULT"></category>

@@ -1,4 +1,22 @@
-package com.android.fuploadr;
+/**
+ *  FlickrBot: A Flickr upload client for Android
+ *  Copyright (C) 2009 Matt Mets
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package com.android.flickrbot;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -10,8 +28,10 @@ import android.util.Log;
 /**
  * This class manages access to the configuration settings, enabling them to
  * persistent across sessions.
+ * 
+ * @author Matt Mets
  */
-public class UploadrHelper {
+public class Database {
 
     private static final String DATABASE_NAME = "uploadr.db";
     private static final int DATABASE_VERSION = 1;
@@ -25,16 +45,40 @@ public class UploadrHelper {
     private SQLiteDatabase  m_db; 
     
     /**
+     * This class helps open, create, and upgrade the database file.
+     */
+    private static class DatabaseHelper extends SQLiteOpenHelper {
+        DatabaseHelper(Context context) {
+            super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        }
+
+        @Override
+        public void onCreate(SQLiteDatabase db) {
+            db.execSQL("CREATE TABLE " + CONFIG_TABLE_NAME + " ("
+                    + CONFIG_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                    + CONFIG_NAME + " TEXT,"
+                    + CONFIG_VALUE + " TEXT"
+                    + ");");
+        }
+
+        @Override
+        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+        }
+    }
+    
+    /**
      * At construction, use the database helper to retrieve the database.
      * @param context Application context, passed to DatabaseHelper() context.
      */
-    UploadrHelper(Context context) {
+    Database(Context context) {
     	m_db=(new DatabaseHelper(context).getWritableDatabase());
     	
     	if (m_db == null) {
     		// TODO: How to throw an exception from the constructor?
     	}
     }
+
     
     /**
      * Search for a config parameter.
@@ -88,29 +132,4 @@ public class UploadrHelper {
 		
 		m_db.delete(CONFIG_TABLE_NAME, CONFIG_NAME + "=?", names);
 	}
-	
-	
-    /**
-     * This class helps open, create, and upgrade the database file.
-     */
-    private static class DatabaseHelper extends SQLiteOpenHelper {
-        DatabaseHelper(Context context) {
-            super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        }
-
-        @Override
-        public void onCreate(SQLiteDatabase db) {
-            db.execSQL("CREATE TABLE " + CONFIG_TABLE_NAME + " ("
-                    + CONFIG_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                    + CONFIG_NAME + " TEXT,"
-                    + CONFIG_VALUE + " TEXT"
-                    + ");");
-        }
-
-        @Override
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
-        }
-    }
-
 }
