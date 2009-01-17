@@ -30,7 +30,12 @@ package com.android.fuploadr;
  */
 
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.util.Iterator;
@@ -38,14 +43,24 @@ import java.util.TreeMap;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.InputStreamBody;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.provider.MediaStore.Images.Media;
 
 public class FlickrHelper {
 /*
@@ -53,7 +68,10 @@ public class FlickrHelper {
 	private static final String SECRET = "";
 	private static final String TOKEN = "";
 */
-	
+
+	// Note: Don't screw with these.  If you intend to fork this application or
+	//       do something else with this code, get your own API key from Flickr.
+	//       It's free and painless.
 	private static final String KEY = "ae428503428bda12221b5d170edca5a0";
 	private static final String SECRET = "b0d05b2be4e7cee4";
 
@@ -61,6 +79,7 @@ public class FlickrHelper {
 	private static final String AUTH_TOKEN_NAME = "auth_token";
 
 	String REST_URL = "http://api.flickr.com/services/rest/";
+	String UPLOAD_URL = "http://api.flickr.com/services/upload/";
 
 	public class parameterList {
 		private TreeMap<String, String> parameters = new TreeMap<String, String>();
@@ -73,8 +92,10 @@ public class FlickrHelper {
 			parameters.clear();
 		}
 		
-		/** Get a string representation of the parameter list, suitable for a
-		 *  GET query.  Note that this automatically signs the parameter list. */
+		/**
+		 * Get a string representation of the parameter list, suitable for a
+		 * GET query.  Note that this automatically signs the parameter list.
+		 * */
 		public String getSignedList() {
 		    // Add each of the parameters in the form ?keya=valuea&keyb=valueb
 			String list = "?";
@@ -96,6 +117,34 @@ public class FlickrHelper {
 		    list += "&api_sig=" + getSig();
 			
 			return list;
+		}
+		
+		/**
+		 * Get a MultipartEntity object representation of the parameter list,
+		 * suitable for passing to a httpClient() execute.
+		 */
+		public MultipartEntity getMultipartEntity() {
+			MultipartEntity entity = new MultipartEntity();
+
+		    Iterator iterator = parameters.keySet().iterator();
+		    while (iterator.hasNext()) {
+		    	Object key = iterator.next();
+		    	try {
+					entity.addPart(key.toString(), new StringBody(parameters.get(key)));
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		    }
+
+	    	try {
+				entity.addPart("api_sig", new StringBody(getSig()));
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		    
+			return entity;
 		}
 		
 		/** Get the MD5 signature of the parameter list */ 
@@ -175,14 +224,23 @@ public class FlickrHelper {
 		}
 	}	
 	
-	public void sendPhoto(String title, String description, String tags) {
+	/**
+	 * Upload a photo to Flickr using the current user credentials.
+	 * 
+	 * @param title Photo title
+	 * @param description Photo description
+	 * @param tags Tags to assign to photo
+	 * @param image JPEG object representing the photo
+	 */
+	public void sendPhoto(String title, String description, String tags, InputStream image) {
 		// TODO: Verify that we are authorized first.
 
-		/** Build a representation of the parameter list, and use it to sign the request. */
+		/** Build a representation of the parameter list, and use it to sign the request. **/
 		parameterList params = this.new parameterList();
 		params.addParameter("api_key", KEY);
-		params.addParameter("auth_token", TOKEN);
+		params.addParameter("auth_token", m_database.getConfigValue(AUTH_TOKEN_NAME));
 		
+		/** Add all of the extra parameters that are passed along with the image **/
 		if (title.length() > 0) {
 			params.addParameter("title", title);
 		}
@@ -196,9 +254,53 @@ public class FlickrHelper {
 		}
 		
 		System.out.println( params.getSignedList() );
+
+		// Get a multipart representation of the parameter list, so that the picture can be appended to it.
+		MultipartEntity multipart = params.getMultipartEntity();
+
+//		System.out.println( "image size is: " + imageData.length);
+//		InputStream ins = new ByteArrayInputStream(imageData);
+		multipart.addPart("photo", new InputStreamBody(image, "photo"));
+    	
+		HttpClient client = new DefaultHttpClient();
+
+		HttpPost postrequest = new HttpPost(UPLOAD_URL);
+		postrequest.setEntity(multipart);
 		
-//		HttpClient client = new DefaultHttpClient();
-//		HttpGet getrequest = new HttpGet(request);
+		HttpResponse response;
+		
+		if (postrequest == null) {
+			System.out.println( "post request is somehow null!");
+		}
+		else {
+			System.out.println( "post request seems good.");			
+		}
+		
+		try {
+			response = client.execute(postrequest);
+
+			System.out.println( "POST response code: " + response.getStatusLine().getReasonPhrase());
+			HttpEntity resp = response.getEntity();
+			
+			if( resp == null) {
+				System.out.println( "entity is null.");
+			}
+			else {
+				byte[] b = new byte[999];
+				resp.getContent().read(b);
+				
+				System.out.println( "Respnse: " + new String(b));				
+			}
+			
+		} catch (ClientProtocolException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+
 		
 	}
 

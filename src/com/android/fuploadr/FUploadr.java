@@ -1,9 +1,18 @@
 package com.android.fuploadr;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLConnection;
+
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore.Images.Media;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -128,12 +137,54 @@ public class FUploadr extends Activity {
             	final String description = ((EditText) findViewById(R.id.DescriptionText)).getText().toString();
             	final String tags = ((EditText) findViewById(R.id.TagsText)).getText().toString();
             	
-            	System.out.println("Photo URI: " + intent.getDataString());
             	
-            	FlickrHelper helper = new FlickrHelper(m_database);
-				helper.sendPhoto(title, description, tags);           
-				
-				finish();
+            	
+            	System.out.println("Intent is: " + intent.getExtras());
+
+            	// TODO: Check that all of these intermediate steps are ok
+            	Bundle data = intent.getExtras();
+            	Uri uri = (Uri) data.getParcelable(Intent.EXTRA_STREAM);
+                
+            	if (uri==null) {
+            		System.out.println("uri is null!");
+            	}
+            	else {
+            		System.out.println("uri has something in it: " + uri.toString());
+            	
+            		// Get photo from URI
+					try {
+						InputStream is = getContentResolver().openInputStream(uri);
+						
+/**						
+						// Grab out the photo and build a post stream out of it
+						byte[] imageData = null;
+
+						Bitmap bitmap = Media.getBitmap(getContentResolver(),
+								uri);
+						ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+
+						bitmap.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
+
+						imageData = bytes.toByteArray();
+
+						System.out.println("Photo size: " + imageData.length);
+**/					
+						// Then send the photo
+						FlickrHelper helper = new FlickrHelper(m_database);
+						helper.sendPhoto(title, description, tags, is);
+						
+					} catch (FileNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+
+
+					finish();
+				}
             }
         });
 
